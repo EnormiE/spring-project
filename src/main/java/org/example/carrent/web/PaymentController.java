@@ -2,10 +2,16 @@ package org.example.carrent.web;
 
 import lombok.RequiredArgsConstructor;
 import org.example.carrent.models.Rental;
-import org.example.carrent.repositories.RentalRepository;
+import org.example.carrent.models.User;
 import org.example.carrent.services.PaymentService;
+import org.example.carrent.services.RentalServiceInterface;
+import org.example.carrent.services.UserServiceInterface;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -15,14 +21,17 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final RentalRepository rentalRepository;
+    private final RentalServiceInterface rentalService;
+    private final UserServiceInterface userService;
 
-    @PostMapping("/checkout/{rentalId}")
-    public ResponseEntity<?> createCheckoutSession(@PathVariable String rentalId) {
+    @PostMapping("/checkout")
+    public ResponseEntity<?> createCheckoutSession(@AuthenticationPrincipal UserDetails userDetails) {
         try {
-            Rental rental = rentalRepository.findById(rentalId)
-                    .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono wypożyczenia o ID: " + rentalId));
+            User user = userService.findByLogin(userDetails.getUsername());
 
+            Rental rental = rentalService.findActiveRentalByUserId(user.getId())
+                    .orElseThrow(() -> new IllegalStateException("Nie masz obecnie żadnego aktywnego wypożyczenia"));
+            
             String paymentUrl = paymentService.createPaymentLink(rental);
 
             return ResponseEntity.ok(Map.of("paymentUrl", paymentUrl));

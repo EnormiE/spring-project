@@ -16,22 +16,24 @@ public class GpsTrackerScheduler {
     private final VehicleServiceInterface vehicleService;
     private final Random random = new Random();
 
-    @Scheduled(fixedRate = 10000) // 10s
+    @Scheduled(fixedRate = 10000) // co 10 s
     public void simulateGpsMovement() {
         List<Vehicle> rentedVehicles = vehicleService.findAllVehicles().stream()
                 .filter(Vehicle::isRented)
                 .toList();
 
         for (Vehicle vehicle : rentedVehicles) {
-            if (vehicle.getLatitude() != null && vehicle.getLongitude() != null) {
+            // baza
+            if (vehicle.getLatitude() == null || vehicle.getLongitude() == null) {
+                vehicle.setLatitude(51.2465);
+                vehicle.setLongitude(22.5684);
+            } else {
                 double latChange = (random.nextDouble() - 0.5) * 0.001;
                 double lonChange = (random.nextDouble() - 0.5) * 0.001;
-
                 vehicle.setLatitude(vehicle.getLatitude() + latChange);
                 vehicle.setLongitude(vehicle.getLongitude() + lonChange);
-
-                vehicleService.updateVehicle(vehicle);
             }
+            vehicleService.updateVehicle(vehicle);
         }
     }
 }
