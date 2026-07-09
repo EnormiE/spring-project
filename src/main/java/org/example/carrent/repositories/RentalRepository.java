@@ -10,9 +10,7 @@ import java.util.Optional;
 @Repository
 public interface RentalRepository extends JpaRepository<Rental, String> {
 
-    Optional<Rental> findByVehicleIdAndReturnDateTimeIsNull(String vehicleId);
+    Optional<Rental> findByUser_IdAndReturnDateTimeIsNull(String userId);
 
-    Optional<Rental> findByUserIdAndReturnDateTimeIsNull(String userId);
-
-    List<Rental> findByUserId(String userId);
+    List<Rental> findByUser_Id(String userId);
 }

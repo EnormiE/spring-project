@@ -22,10 +22,9 @@ public class RentalService implements RentalServiceInterface {
     private final RentalRepository rentalRepository;
     private final VehicleServiceInterface vehicleService;
 
-    // współrzędne do zwrotu
     private static final double LUBLIN_LAT = 51.2465;
     private static final double LUBLIN_LON = 22.5684;
-    private static final double MAX_DISTANCE_KM = 0.5; // max 0.5km od bazy
+    private static final double MAX_DISTANCE_KM = 0.5;
 
     @Override
     public Rental rentVehicle(String userId, String vehicleId) throws IllegalStateException, IllegalArgumentException {
@@ -67,7 +66,7 @@ public class RentalService implements RentalServiceInterface {
 
         double distance = calculateDistance(vehicle.getLatitude(), vehicle.getLongitude(), LUBLIN_LAT, LUBLIN_LON);
         if (distance > MAX_DISTANCE_KM) {
-            throw new IllegalStateException(String.format("Pojazd znajduje się za daleko od bazy (%.2f km). Zwrot niemożliwy poza strefą (max 500m).", distance));
+            throw new IllegalStateException(String.format("Pojazd znajduje się za daleko od bazy w Lublinie (%.2f km). Zwrot niemożliwy poza strefą (max 500m).", distance));
         }
 
         LocalDateTime rentDate = LocalDateTime.parse(rental.getRentDateTime());
@@ -88,7 +87,6 @@ public class RentalService implements RentalServiceInterface {
         return rentalRepository.save(rental);
     }
 
-    // matma
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
         double latDistance = Math.toRadians(lat2 - lat1);
@@ -109,7 +107,7 @@ public class RentalService implements RentalServiceInterface {
     @Override
     @Transactional(readOnly = true)
     public List<Rental> findUserRentals(String id) {
-        return rentalRepository.findByUserId(id);
+        return rentalRepository.findByUser_Id(id);
     }
 
     @Override
@@ -127,7 +125,7 @@ public class RentalService implements RentalServiceInterface {
     @Override
     @Transactional(readOnly = true)
     public Optional<Rental> findActiveRentalByUserId(String id) {
-        return rentalRepository.findByUserIdAndReturnDateTimeIsNull(id);
+        return rentalRepository.findByUser_IdAndReturnDateTimeIsNull(id);
     }
 
     @Override
