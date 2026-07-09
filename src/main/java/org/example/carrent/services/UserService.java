@@ -3,7 +3,6 @@ package org.example.carrent.services;
 import lombok.RequiredArgsConstructor;
 import org.example.carrent.models.Role;
 import org.example.carrent.models.User;
-import org.example.carrent.repositories.RentalRepository;
 import org.example.carrent.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ import java.util.UUID;
 public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
-    private final RentalRepository rentalRepository;
+    private final RentalServiceInterface rentalService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -69,7 +68,7 @@ public class UserService implements UserServiceInterface {
             }
         }
 
-        if (rentalRepository.findByUserIdAndReturnDateIsNull(toDeleteId).isPresent()) {
+        if (rentalService.hasActiveRentals(toDeleteId)) {
             throw new IllegalStateException("Nie można usunąć użytkownika, który ma wypożyczony pojazd");
         }
 
