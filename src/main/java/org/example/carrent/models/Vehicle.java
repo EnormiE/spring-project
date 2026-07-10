@@ -18,6 +18,7 @@ import java.util.Map;
 @Table(name = "vehicle")
 public class Vehicle {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, unique = true)
     private String id;
     private String category;
