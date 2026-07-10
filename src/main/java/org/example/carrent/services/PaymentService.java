@@ -14,6 +14,9 @@ public class PaymentService {
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     @PostConstruct
     public void init() {
         Stripe.apiKey = stripeApiKey;
@@ -29,8 +32,8 @@ public class PaymentService {
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:8080/swagger-ui/index.html")
-                .setCancelUrl("http://localhost:8080/swagger-ui/index.html")
+                .setSuccessUrl(frontendUrl + "/swagger-ui/index.html")
+                .setCancelUrl(frontendUrl + "/swagger-ui/index.html")
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
                                 .setQuantity(1L)
