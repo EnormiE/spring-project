@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,6 +49,7 @@ public class RentalService implements RentalServiceInterface {
                 .user(User.builder().id(userId).build())
                 .rentDateTime(LocalDateTime.now().toString())
                 .returnDateTime(null)
+                .paid(false)
                 .build();
 
         return rentalRepository.save(rental);
@@ -80,6 +82,7 @@ public class RentalService implements RentalServiceInterface {
 
         rental.setReturnDateTime(returnDate.toString());
         rental.setTotalCost(totalCost);
+        rental.setPaid(false);
 
         vehicle.setRented(false);
         vehicleService.updateVehicle(vehicle);
@@ -132,5 +135,21 @@ public class RentalService implements RentalServiceInterface {
     @Transactional(readOnly = true)
     public List<Rental> findAllRentals() {
         return rentalRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Rental> findLatestUnpaidReturn(String userId) {
+        return findUserRentals(userId).stream()
+                .filter(rental -> rental.getReturnDateTime() != null && !rental.isPaid())
+                .max(Comparator.comparing(Rental::getReturnDateTime));
+    }
+
+    @Override
+    public void markAsPaid(String rentalId) {
+        rentalRepository.findById(rentalId).ifPresent(rental -> {
+            rental.setPaid(true);
+            rentalRepository.save(rental);
+        });
     }
 }

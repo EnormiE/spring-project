@@ -29,10 +29,12 @@ public class PaymentController {
         try {
             User user = userService.findByLogin(userDetails.getUsername());
 
-            Rental rental = rentalService.findActiveRentalByUserId(user.getId())
-                    .orElseThrow(() -> new IllegalStateException("Nie masz obecnie żadnego aktywnego wypożyczenia"));
-            
+            Rental rental = rentalService.findLatestUnpaidReturn(user.getId())
+                    .orElseThrow(() -> new IllegalStateException("Nie masz żadnych nieopłaconych zwrotów."));
+
             String paymentUrl = paymentService.createPaymentLink(rental);
+
+            rentalService.markAsPaid(rental.getId());
 
             return ResponseEntity.ok(Map.of("paymentUrl", paymentUrl));
         } catch (Exception e) {

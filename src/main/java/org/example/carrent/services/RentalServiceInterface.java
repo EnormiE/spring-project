@@ -21,5 +21,9 @@ public interface RentalServiceInterface {
 
     boolean vehicleHasActiveRental(String vehicleId);
 
-    boolean hasActiveRentals(String userId); // Dla UserService (separacja domen)
+    boolean hasActiveRentals(String userId);
+
+    Optional<Rental> findLatestUnpaidReturn(String userId);
+
+    void markAsPaid(String rentalId);
 }

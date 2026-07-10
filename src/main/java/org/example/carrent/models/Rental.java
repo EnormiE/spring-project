@@ -31,9 +31,11 @@ public class Rental {
     @Column(name = "return_date")
     private String returnDateTime;
 
-    // finalny koszt do zapłaty
     @Column(name = "total_cost")
     private Double totalCost;
+
+    @Column(name = "paid")
+    private boolean paid;
 
     public Rental copy() {
         return Rental.builder()
@@ -43,6 +45,7 @@ public class Rental {
                 .rentDateTime(rentDateTime)
                 .returnDateTime(returnDateTime)
                 .totalCost(totalCost)
+                .paid(paid)
                 .build();
     }
 
